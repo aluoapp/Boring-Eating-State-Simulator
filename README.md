@@ -1,4 +1,4 @@
-# Boring Eating State Simulator
+# [Boring Eating State Simulator](https://boring-eating-state-simulator.aluo.app/)
 
 A relaxing and interactive web animation that simulates different eating states through a playful bowl interface.
 
