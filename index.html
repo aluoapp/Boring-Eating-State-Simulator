@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boring Eating State Simulator - Interactive Food Animation Game</title>
+    <meta name="description" content="Experience a fun and interactive eating simulation game. Watch as the bowl fills up and emotions change through different eating states: hungry, eating, and full. A relaxing web animation experience.">
+    <meta name="keywords" content="eating simulator, food animation, interactive game, web animation, eating states, bowl animation, relaxing game">
+    <meta name="author" content="Trae">
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Boring Eating State Simulator - Interactive Food Animation">
+    <meta property="og:description" content="A fun interactive eating simulation with animated states and dynamic effects. Watch the eating process from hungry to full!">
+    <meta property="og:type" content="website">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes wave {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .wave-animation {
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .pulse-animation {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .trail {
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="relative w-full h-screen">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"></div>
+        <div class="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full filter blur-3xl opacity-10"></div>
+        <div class="absolute bottom-10 right-10 w-40 h-40 bg-blue-500 rounded-full filter blur-3xl opacity-10"></div>
+
+        <!-- Main Container -->
+        <div class="relative z-10 flex flex-col items-center justify-center h-full">
+            <!-- Settings Button (Bottom Right) -->
+            <div class="absolute bottom-6 right-6 z-20 flex space-x-4">
+                <button id="settings-btn"
+                    class="p-3 bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-lg rounded-full shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="text-gray-300">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                </button>
+                <button id="fullscreen-btn"
+                    class="p-3 bg-gray-800 bg-opacity-70 backdrop-filter backdrop-blur-lg rounded-full shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="text-gray-300">
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="9 21 3 21 3 15"></polyline>
+                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    </svg>
+                </button>
+                <button id="control-btn-bottom"
+                    class="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-300 transform hover:scale-105">
+                    <img src="https://unpkg.com/lucide-static@latest/icons/utensils.svg" alt="Start Eating" class="icon">
+                </button>
+            </div>
+
+            <!-- Settings Panel (Hidden by default) -->
+            <div id="settings-panel"
+                class="absolute bottom-20 right-6 w-64 p-4 bg-gray-800 bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl border border-gray-700 shadow-2xl z-20 hidden">
+                <h3 class="text-gray-300 text-lg font-medium mb-3">Settings</h3>
+                <div class="flex items-center justify-between mb-2">
+                    <label for="auto-cycle" class="text-gray-400 text-sm">Auto Cycle States</label>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                        <input type="checkbox" id="auto-cycle"
+                            class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer transition-transform duration-200 ease-in transform translate-x-0 checked:translate-x-4 checked:border-purple-500 focus:outline-none">
+                        <label for="auto-cycle"
+                            class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer"></label>
+                    </div>
+                </div>
+            </div>
+            <div id="scene-container"
+                class="w-[600px] h-[400px] bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-lg rounded-2xl border border-gray-700 shadow-2xl flex flex-col items-center justify-center relative overflow-hidden">
+                <div id="follower"
+                    class="absolute w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 filter blur-sm opacity-70 pointer-events-none z-10 hidden">
+                </div>
+                <div id="trail-container" class="absolute inset-0 pointer-events-none z-0"></div>
+
+                <div id="state-graphic" class="relative w-40 h-40 mb-6">
+                    <svg id="bowl" class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20,50 A30,30 0 0,1 80,50 L80,80 A30,10 0 0,1 20,80 Z" fill="none" stroke="#6B7280"
+                            stroke-width="2" />
+
+                        <path id="food" d="M20,80 A30,10 0 0,0 80,80 L80,80 A30,10 0 0,1 20,80 Z" fill="#6366F1"
+                            opacity="0" />
+
+                        <g id="smile" opacity="0">
+                            <circle cx="40" cy="60" r="3" fill="#111827" />
+                            <circle cx="60" cy="60" r="3" fill="#111827" />
+                            <path d="M35,70 Q50,80 65,70" fill="none" stroke="#111827" stroke-width="2"
+                                stroke-linecap="round" />
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Status Text -->
+                <div id="state-text" class="text-gray-300 text-xl font-medium mb-8">Click to Start</div>
+
+
+            </div>
+
+            <!-- State Indicators -->
+            <div class="mt-8 flex space-x-4">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-gray-500 mr-2" id="state-indicator-1"></div>
+                    <span class="text-gray-400 text-sm">Hungry</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-gray-500 mr-2" id="state-indicator-2"></div>
+                    <span class="text-gray-400 text-sm">Eating</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full bg-gray-500 mr-2" id="state-indicator-3"></div>
+                    <span class="text-gray-400 text-sm">Full</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State definitions
+        const states = {
+            INITIAL: 'initial',
+            HUNGRY: 'hungry',
+            EATING: 'eating',
+            FULL: 'full'
+        };
+
+        // State colors
+        const stateColors = {
+            [states.HUNGRY]: '#F59E0B', // Amber for hungry
+            [states.EATING]: '#10B981', // Emerald for eating
+            [states.FULL]: '#8B5CF6'    // Violet for full
+        };
+
+        // Current state
+        let currentState = states.INITIAL;
+        let isAnimating = false;
+        let isAutoCycle = false;
+        let isFullscreen = false;
+        let autoCycleTimeout = null;
+
+        // DOM elements
+        const bowl = document.getElementById('bowl');
+        const food = document.getElementById('food');
+        const smile = document.getElementById('smile');
+        const stateText = document.getElementById('state-text');
+        const controlBtnBottom = document.getElementById('control-btn-bottom');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsPanel = document.getElementById('settings-panel');
+        const autoCycleToggle = document.getElementById('auto-cycle');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const stateIndicators = [
+            document.getElementById('state-indicator-1'),
+            document.getElementById('state-indicator-2'),
+            document.getElementById('state-indicator-3')
+        ];
+        const sceneContainer = document.getElementById('scene-container');
+
+        // Mouse follower effect
+        const follower = document.getElementById('follower');
+        const trailContainer = document.getElementById('trail-container');
+        let mouseX = 0, mouseY = 0;
+        let followerX = 0, followerY = 0;
+        const trailElements = [];
+        const maxTrails = 10;
+
+        // Listen for mouse movement
+        sceneContainer.addEventListener('mousemove', (e) => {
+            const rect = sceneContainer.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+            follower.classList.remove('hidden');
+
+            // Create trail element
+            createTrailElement(mouseX, mouseY);
+        });
+
+        sceneContainer.addEventListener('mouseleave', () => {
+            follower.classList.add('hidden');
+        });
+
+        // Settings panel toggle
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.toggle('hidden');
+        });
+
+        // Auto cycle toggle
+        //  DOM elements 
+        //  localStorage
+        const savedAutoCycle = localStorage.getItem('autoCycle') === 'true';
+        isAutoCycle = savedAutoCycle;
+        autoCycleToggle.checked = savedAutoCycle;
+
+        if (isAutoCycle && currentState === states.INITIAL) {
+            startStateSequence();
+        }
+
+        autoCycleToggle.addEventListener('change', (e) => {
+            isAutoCycle = e.target.checked;
+            localStorage.setItem('autoCycle', isAutoCycle);
+            if (isAutoCycle && currentState === states.INITIAL) {
+                startStateSequence();
+            }
+        });
+
+        // Fullscreen toggle
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+        // Create trail element
+        function createTrailElement(x, y) {
+            const trail = document.createElement('div');
+
+            // Use different colors based on current state
+            let trailClass = 'trail absolute w-8 h-8 rounded-full filter blur-md';
+
+            if (currentState === states.HUNGRY) {
+                trailClass += ' bg-gradient-to-r from-amber-400 to-amber-600';
+            } else if (currentState === states.EATING) {
+                trailClass += ' bg-gradient-to-r from-emerald-400 to-emerald-600';
+            } else if (currentState === states.FULL) {
+                trailClass += ' bg-gradient-to-r from-violet-400 to-violet-600';
+            } else {
+                trailClass += ' bg-gradient-to-r from-blue-400 to-purple-500';
+            }
+
+            trail.className = trailClass;
+            trail.style.left = `${x}px`;
+            trail.style.top = `${y}px`;
+            trail.style.transform = 'translate(-50%, -50%)';
+
+            trailContainer.appendChild(trail);
+            trailElements.push(trail);
+
+            // Limit trail count
+            if (trailElements.length > maxTrails) {
+                const oldestTrail = trailElements.shift();
+                oldestTrail.remove();
+            }
+
+            setTimeout(() => {
+                trail.style.opacity = '0';
+                setTimeout(() => trail.remove(), 500);
+            }, 100);
+        }
+
+        // Animation loop
+        function animate() {
+            // Smooth mouse following
+            followerX += (mouseX - followerX) * 0.1;
+            followerY += (mouseY - followerY) * 0.1;
+            follower.style.left = `${followerX}px`;
+            follower.style.top = `${followerY}px`;
+            follower.style.transform = 'translate(-50%, -50%)';
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Control button click event
+        controlBtnBottom.addEventListener('click', handleControlClick);
+
+        function handleControlClick() {
+            if (isAnimating) return;
+
+            if (currentState === states.INITIAL) {
+                startStateSequence();
+            } else {
+                resetState();
+            }
+        }
+
+        // Fullscreen toggle function
+        function toggleFullscreen() {
+            const isInFullScreen = (document.fullscreenElement !== null) || 
+                          (window.innerHeight === screen.height && window.innerWidth === screen.width);
+
+            if (!isInFullScreen) {
+                document.documentElement.requestFullscreen().then(() => {
+                    isFullscreen = true;
+                    const controlButtons = document.querySelector('.absolute.bottom-6.right-6');
+                    if (controlButtons) {
+                        controlButtons.style.opacity = '0';
+                        controlButtons.style.pointerEvents = 'none';
+
+                        // Add mouse move listener to show/hide buttons
+                        let timeout;
+                        const handleMouseMove = (e) => {
+                            const rect = controlButtons.getBoundingClientRect();
+                            const mouseX = e.clientX;
+                            const mouseY = e.clientY;
+
+                            // Show buttons when mouse is near the bottom-right corner
+                            if (mouseY > window.innerHeight - 100 && mouseX > window.innerWidth - 200) {
+                                controlButtons.style.opacity = '1';
+                                controlButtons.style.pointerEvents = 'auto';
+
+                                clearTimeout(timeout);
+                                timeout = setTimeout(() => {
+                                    controlButtons.style.opacity = '0';
+                                    controlButtons.style.pointerEvents = 'none';
+                                }, 1000);
+                            }
+                        };
+
+                        document.addEventListener('mousemove', handleMouseMove);
+                        document.addEventListener('keydown', handleEscKey);
+                    }
+                }).catch((err) => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (!document.fullscreenElement) {
+                    alert('Please press F11 to exit fullscreen mode');
+                    return;
+                }
+                exitFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().then(() => {
+                    isFullscreen = false;
+                    const controlButtons = document.querySelector('.absolute.bottom-6.right-6');
+                    if (controlButtons) {
+                        controlButtons.style.opacity = '1';
+                        controlButtons.style.pointerEvents = 'auto';
+                        controlButtons.style.transition = 'opacity 0.3s ease';
+                    }
+
+                    // Remove all event listeners
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('keydown', handleEscKey);
+                }).catch(err => {
+                    console.error(`Error attempting to exit fullscreen: ${err.message}`);
+                });
+            }
+        }
+
+        function handleEscKey(e) {
+            if (e.key === 'Escape' && isFullscreen) {
+                exitFullscreen();
+                document.removeEventListener('keydown', handleEscKey);
+            }
+        }
+
+        // Start state sequence
+        function startStateSequence() {
+            isAnimating = true;
+            controlBtnBottom.disabled = true;
+            controlBtnBottom.classList.add('opacity-50');
+
+            // Clear any existing timeout
+            if (autoCycleTimeout) {
+                clearTimeout(autoCycleTimeout);
+                autoCycleTimeout = null;
+            }
+
+            // Hungry state
+            setHungryState();
+
+            // Timer sequence
+            setTimeout(() => {
+                // Eating state
+                setEatingState();
+
+                setTimeout(() => {
+                    // Full state
+                    setFullState();
+
+                    setTimeout(() => {
+                        // Enable reset button
+                        controlBtnBottom.disabled = false;
+                        controlBtnBottom.classList.remove('opacity-50');
+
+                        const controlBtnImg = controlBtnBottom.querySelector('img');
+                        controlBtnImg.src = "https://unpkg.com/lucide-static@latest/icons/refresh-cw.svg";
+                        controlBtnImg.alt = "Restart";
+                        isAnimating = false;
+
+                        // Auto cycle if enabled
+                        if (isAutoCycle) {
+                            autoCycleTimeout = setTimeout(() => {
+                                resetState();
+                                startStateSequence();
+                            }, 1000); // Wait 1 second before restarting
+                        }
+                    }, 3000); // Full state lasts 3 seconds
+
+                }, 2000); // Eating state lasts 2 seconds
+
+            }, 1500); // Hungry state lasts 1.5 seconds
+        }
+
+        // Set hungry state
+        function setHungryState() {
+            currentState = states.HUNGRY;
+            updateStateIndicators(0);
+
+            // Update text
+            stateText.textContent = "I'm so hungry...";
+
+            // Update graphics with hungry color
+            food.setAttribute('d', 'M20,75 A30,10 0 0,0 80,75 L80,80 A30,10 0 0,1 20,80 Z');
+            food.setAttribute('fill', stateColors[states.HUNGRY]);
+            food.setAttribute('opacity', '1');
+            smile.setAttribute('opacity', '0');
+
+            // Update follower color for hungry state
+            follower.className = 'absolute w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 filter blur-sm opacity-70 pointer-events-none z-10';
+        }
+
+        // Set eating state
+        function setEatingState() {
+            currentState = states.EATING;
+            updateStateIndicators(1);
+
+            // Update text
+            stateText.textContent = "Eating like crazy!";
+
+            // Update graphics with eating color
+            food.setAttribute('d', 'M20,60 A30,10 0 0,0 80,60 L80,80 A30,10 0 0,1 20,80 Z');
+            food.setAttribute('fill', stateColors[states.EATING]);
+            food.classList.add('wave-animation');
+
+            // Update follower color for eating state
+            follower.className = 'absolute w-16 h-16 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600 filter blur-sm opacity-70 pointer-events-none z-10';
+        }
+
+        // Set full state
+        function setFullState() {
+            currentState = states.FULL;
+            updateStateIndicators(2);
+
+            // Update text
+            stateText.textContent = "Burp~ So satisfied!";
+
+            // Update graphics with full color
+            food.setAttribute('d', 'M20,50 A30,10 0 0,0 80,50 L80,80 A30,10 0 0,1 20,80 Z');
+            food.setAttribute('fill', stateColors[states.FULL]);
+            food.classList.remove('wave-animation');
+            food.classList.add('pulse-animation');
+            smile.setAttribute('opacity', '1');
+            smile.classList.add('float-animation');
+
+            // Update follower color for full state
+            follower.className = 'absolute w-16 h-16 rounded-full bg-gradient-to-r from-violet-400 to-violet-600 filter blur-sm opacity-70 pointer-events-none z-10';
+        }
+
+        // Reset state
+        function resetState() {
+            currentState = states.INITIAL;
+            updateStateIndicators(-1);
+
+            // Clear any existing timeout
+            if (autoCycleTimeout) {
+                clearTimeout(autoCycleTimeout);
+                autoCycleTimeout = null;
+            }
+
+            // Update text
+            stateText.textContent = "Click to Start";
+
+            // Update graphics
+            food.setAttribute('opacity', '0');
+            food.classList.remove('wave-animation', 'pulse-animation');
+            smile.setAttribute('opacity', '0');
+            smile.classList.remove('float-animation');
+
+            // Update buttons
+            
+            // Reset follower color
+            follower.className = 'absolute w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 filter blur-sm opacity-70 pointer-events-none z-10 hidden';
+        }
+
+        // Update state indicators
+        function updateStateIndicators(activeIndex) {
+            stateIndicators.forEach((indicator, index) => {
+                // Remove all possible color classes
+                indicator.classList.remove('bg-gray-500', 'bg-amber-500', 'bg-emerald-500', 'bg-violet-500');
+
+                if (index === activeIndex) {
+                    // Add appropriate color based on state
+                    if (index === 0) { // Hungry
+                        indicator.classList.add('bg-amber-500');
+                    } else if (index === 1) { // Eating
+                        indicator.classList.add('bg-emerald-500');
+                    } else if (index === 2) { // Full
+                        indicator.classList.add('bg-violet-500');
+                    }
+                } else {
+                    indicator.classList.add('bg-gray-500');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
